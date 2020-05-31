@@ -31,8 +31,10 @@ mod read {
         let bone = Bone {
             name: "n_hara_cp".into(),
             mode: BoneType::Type3,
-            unk: [0, 0, 255, 0],
-            parent: false,
+            parent: None,
+            pole_target: None,
+            mirror: None,
+            unk2: 0
         };
         assert_eq!(skel.bones[0], bone);
         assert_eq!(skel.bones.len(), 177);
@@ -46,8 +48,10 @@ mod read {
         let bone_res = Bone {
             name: "n_hara_cp".into(),
             mode: BoneType::Type3,
-            unk: [0, 0, 255, 0],
-            parent: false,
+            parent: None,
+            pole_target: None,
+            mirror: None,
+            unk2: 0
         };
         assert_eq!(bone, bone_res);
     }
