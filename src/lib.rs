@@ -1,5 +1,7 @@
 use log::*;
 
+#[cfg(feature="pyo3")]
+mod py_ffi;
 pub mod bone;
 pub mod mot;
 

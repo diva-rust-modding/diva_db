@@ -6,6 +6,10 @@ edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+name = "diva_db"
+crate-type = ["cdylib"]
+
 [dependencies]
 nom = "5.0.1"
 smart-default = "0.5.2"
@@ -14,6 +18,7 @@ log = "0.4.8"
 serde = { version="1.0.102", optional=true, features=["derive"]}
 cookie-factory = "0.3.0"
 nom_ext = { path = "/home/waelwindows/rust/nom_ext" }
+pyo3 = { version = "0.10.1", optional = true }
 
 [dev-dependencies]
 criterion = "0.3.0"

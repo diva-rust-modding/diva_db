@@ -10,6 +10,8 @@ use smart_default::*;
 use std::borrow::Cow;
 
 mod read;
+#[cfg(feature="pyo3")]
+pub mod py_ffi;
 #[cfg(test)]
 mod tests;
 
