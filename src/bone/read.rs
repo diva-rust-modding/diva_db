@@ -54,8 +54,18 @@ skeleton_names: {} * {}",
         let (_, skeleton_names) = count(offset_string(i), skel_cnt)(&i[skel_name_ptr..])?;
         debug!("bonedb {:#?}", skeleton_names);
 
-        let skeletons = skeletons.into_iter().zip(skeleton_names.into_iter()).map(|(s, name)| Skeleton { name, .. s }).collect();
-        Ok((i0, BoneDatabase { signature, skeletons }))
+        let skeletons = skeletons
+            .into_iter()
+            .zip(skeleton_names.into_iter())
+            .map(|(s, name)| Skeleton { name, ..s })
+            .collect();
+        Ok((
+            i0,
+            BoneDatabase {
+                signature,
+                skeletons,
+            },
+        ))
     }
 }
 
@@ -79,12 +89,20 @@ impl<'a> Skeleton<'a> {
     obj: {}*{:#X?}
     mot: {}*{:#X?}
     parent : {}*{:#X?}",
-                bone_ptr, pos_cnt, pos_ptr, obj_cnt, obj_ptr, mot_cnt, mot_ptr, mot_cnt, parent_id_ptr
+                bone_ptr,
+                pos_cnt,
+                pos_ptr,
+                obj_cnt,
+                obj_ptr,
+                mot_cnt,
+                mot_ptr,
+                mot_cnt,
+                parent_id_ptr
             );
 
             let (_, bones) = nom::multi::many0(Bone::read(i0))(&i0[bone_ptr..])?;
             trace!("[SUCESS] Bone read");
-            let vec3 = tuple((le_f32, le_f32, le_f32));
+            let vec3 = map(tuple((le_f32, le_f32, le_f32)), |(x, y, z)| [x, y, z]);
             let (_, pos) = count(vec3, pos_cnt)(&i0[pos_ptr..])?;
             //println!("vec3: {:.02?}", pos);
             trace!("[SUCESS] Position read");
@@ -117,7 +135,13 @@ impl<'a> Bone<'a> {
             trace!("Mode read: {}", i[0]);
             let (_, mode) = map_opt(le_u8, |x| BoneType::from_int(x))(i)?;
             let parent = i[1] != 0;
-            let unk = [i[2], i[3], i[4], i[6]];
+            let parent = if parent { Some(i[2]) } else { None };
+            let pole_target = if i[3] != 0 { Some(i[3] )} else { None };
+            let mirror = if i[4] != 255 { Some(i[4]) } else { None };
+            let has_unk = i[5] != 0;
+            let unk2 = if has_unk { Some(i[6]) } else { None };
+            let unk2 = i[5];
+            // let unk = [i[2], i[3], i[4], i[6]];
             //seek 2 bytes then read ptr
             let (i, name) = offset_string(i0)(&i[8..])?;
             trace!("bone name={}", name);
@@ -126,7 +150,9 @@ impl<'a> Bone<'a> {
                 Bone {
                     mode,
                     parent,
-                    unk,
+                    pole_target,
+                    mirror,
+                    unk2,
                     name,
                 },
             ))

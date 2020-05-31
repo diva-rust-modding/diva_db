@@ -5,7 +5,9 @@ mod read {
     use crate::bone::*;
     use crate::*;
     const INPUT: &[u8] = include_bytes!("../../assets/f_bonedb.bin");
-    const NAMES: &[&str] = &[ "CMN", "HAK", "KAI", "LEN", "LUK", "MEI", "MIK", "NER", "RIN", "SAK", "TET"];
+    const NAMES: &[&str] = &[
+        "CMN", "HAK", "KAI", "LEN", "LUK", "MEI", "MIK", "NER", "RIN", "SAK", "TET",
+    ];
 
     fn init() {
         let _ = env_logger::builder().is_test(true).try_init();
@@ -34,7 +36,7 @@ mod read {
         };
         assert_eq!(skel.bones[0], bone);
         assert_eq!(skel.bones.len(), 177);
-        assert_eq!(skel.pos[0], (0., 0., 0.));
+        assert_eq!(skel.pos[0], [0., 0., 0.]);
         assert_eq!(skel.parent_ids[0], -1);
     }
 

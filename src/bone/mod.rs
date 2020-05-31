@@ -1,30 +1,29 @@
 use crate::*;
 use int_enum::*;
-#[cfg(feature="serde")]
-use serde::*;
 use nom::{
-    bytes::complete::is_not, combinator::map,
-    multi::*, number::complete::*, sequence::tuple, *,
+    bytes::complete::is_not, combinator::map, multi::*, number::complete::*, sequence::tuple, *,
 };
+#[cfg(feature = "serde")]
+use serde::*;
 use smart_default::*;
 
 use std::borrow::Cow;
 
+mod read;
 #[cfg(test)]
 mod tests;
-mod read;
 
-type Vec3 = (f32, f32, f32);
+type Vec3 = [f32; 3];
 
 #[derive(Debug, Default, PartialEq, PartialOrd)]
-#[cfg_attr(feature="serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct BoneDatabase<'a> {
     pub signature: u32,
     pub skeletons: Vec<Skeleton<'a>>,
 }
 
 #[derive(Debug, Default, PartialEq, PartialOrd)]
-#[cfg_attr(feature="serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Skeleton<'a> {
     pub name: Cow<'a, str>,
     pub bones: Vec<Bone<'a>>,
@@ -35,18 +34,20 @@ pub struct Skeleton<'a> {
     pub motion_bone_names: Vec<Cow<'a, str>>,
 }
 
-#[derive(Debug, Default, PartialEq, PartialOrd)]
-#[cfg_attr(feature="serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Default, PartialEq, PartialOrd, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Bone<'a> {
     pub mode: BoneType,
-    pub parent: bool,
-    pub unk: [u8; 4],
+    pub parent: Option<u8>,
+    pub pole_target: Option<u8>, //only set in type 5 bones
+    pub mirror: Option<u8>,
+    pub unk2: u8,
     pub name: Cow<'a, str>,
 }
 
 #[int_enum(u8)]
-#[derive(Debug, SmartDefault, PartialEq, PartialOrd)]
-#[cfg_attr(feature="serde", derive(Serialize, Deserialize))]
+#[derive(Debug, SmartDefault, PartialEq, PartialOrd, Copy, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 //Need to explictly set variant numbers for int_enum to work
 pub enum BoneType {
     #[default]

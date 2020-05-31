@@ -1,6 +1,7 @@
 use log::*;
 
 pub mod bone;
+pub mod mot;
 
 #[cfg(test)]
 mod tests {
