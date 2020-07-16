@@ -33,13 +33,14 @@ pub struct PySkeleton {
 #[pyclass(module = "bones")]
 #[derive(Debug, Default, PartialEq, PartialOrd, Clone)]
 pub struct PyBone {
-    // pub mode: BoneType,
     #[pyo3(get, set)]
-    pub parent: u8,
+    pub mode: u8,
     #[pyo3(get, set)]
-    pub pole_target: u8, //only set in type 5 bones
+    pub parent: Option<u8>,
     #[pyo3(get, set)]
-    pub mirror: u8,
+    pub pole_target: Option<u8>, //only set in type 5 bones
+    #[pyo3(get, set)]
+    pub mirror: Option<u8>,
     #[pyo3(get, set)]
     pub unk2: u8,
     #[pyo3(get, set)]
@@ -71,13 +72,14 @@ impl From<Bone<'_>> for PyBone {
     fn from(bone: Bone<'_>) -> Self {
         let Bone { parent, pole_target, mirror, unk2, name, mode } = bone;
 
-        let parent = parent.unwrap_or(255);
-        let pole_target = pole_target.unwrap_or(255);
-        let mirror = mirror.unwrap_or(255);
+        // let parent = parent.unwrap_or(255);
+        // let pole_target = pole_target.unwrap_or(255);
+        // let mirror = mirror.unwrap_or(255);
 
+        let mode = mode as u8;
         let name = name.into_owned();
 
-        Self { parent, pole_target, mirror, name, unk2 }
+        Self { parent, pole_target, mirror, name, unk2, mode }
     }
 }
 

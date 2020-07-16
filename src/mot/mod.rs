@@ -1,4 +1,6 @@
 use nom_ext::*;
+#[cfg(feature = "serde")]
+use serde::*;
 
 use super::*;
 
@@ -6,14 +8,18 @@ use std::borrow::Cow;
 
 #[cfg(test)]
 mod tests;
+#[cfg(feature="pyo3")]
+pub mod py_ffi;
 
 #[derive(Debug, Default, PartialEq, PartialOrd)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct MotionInfo<'a> {
     name: Cow<'a, str>,
     id: u32,
 }
 
 #[derive(Debug, Default, PartialEq, PartialOrd)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct MotionSetInfo<'a> {
     name: Cow<'a, str>,
     id: u32,
@@ -21,6 +27,7 @@ pub struct MotionSetInfo<'a> {
 }
 
 #[derive(Debug)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct MotionSetDatabase<'a> {
     pub sets: Vec<MotionSetInfo<'a>>,
     pub bones: Vec<Cow<'a, str>>,

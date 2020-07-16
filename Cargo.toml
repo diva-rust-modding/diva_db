@@ -8,7 +8,7 @@ edition = "2018"
 
 [lib]
 name = "diva_db"
-crate-type = ["cdylib"]
+crate-type = ["lib", "dylib"]
 
 [dependencies]
 nom = "5.0.1"
