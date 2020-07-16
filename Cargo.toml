@@ -17,7 +17,7 @@ int-enum = "0.1.0"
 log = "0.4.8"
 serde = { version="1.0.102", optional=true, features=["derive"]}
 cookie-factory = "0.3.0"
-nom_ext = { path = "/home/waelwindows/rust/nom_ext" }
+nom_ext = { git="https://github.com/Waelwindows/nom_ext" }
 pyo3 = { version = "0.10.1", optional = true }
 
 [dev-dependencies]
