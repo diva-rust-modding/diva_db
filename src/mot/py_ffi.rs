@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
+use pyo3::PyObjectProtocol;
 
 use super::*;
 
@@ -53,6 +54,29 @@ impl<'a> From<MotionSetDatabase<'a>> for PyMotionSetDatabase {
         let sets = sets.into_iter().map(Into::into).collect();
         let bones = bones.into_iter().map(Into::into).collect();
         Self { sets, bones }
+    }
+}
+
+#[pyproto]
+impl<'p> PyObjectProtocol<'p> for PyMotionSetInfo {
+    fn __repr__(&'p self) -> PyResult<String> {
+        Ok(format!(
+            "PyMotionSetInfo({}: {}, {} mot(s))",
+            self.id,
+            self.name,
+            self.mots.len()
+        ))
+    }
+}
+
+#[pyproto]
+impl<'p> PyObjectProtocol<'p> for PyMotionInfo {
+    fn __repr__(&'p self) -> PyResult<String> {
+        Ok(format!(
+            "PyMotionInfo({}: {})",
+            self.id,
+            self.name,
+        ))
     }
 }
 

@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
+use pyo3::PyObjectProtocol;
 
 use std::collections::BTreeMap;
 
@@ -23,6 +24,17 @@ impl<'a> From<PyTextureDatabase> for TextureDatabase<'a> {
     fn from(db: PyTextureDatabase) -> Self {
         let entries = db.entries.into_iter().map(|(k, v)| (k, v.into())).collect();
         Self { entries }
+    }
+}
+
+#[pyproto]
+impl<'p> PyObjectProtocol<'p> for PyTextureDatabase {
+
+    fn __repr__(&'p self) -> PyResult<String> {
+        Ok(format!(
+            "PyTextureDatabase: {} textures",
+            self.entries.len(),
+        ))
     }
 }
 

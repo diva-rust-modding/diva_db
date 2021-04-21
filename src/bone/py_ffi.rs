@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
+use pyo3::PyObjectProtocol;
 
 use super::*;
 
@@ -80,6 +81,39 @@ impl From<Bone<'_>> for PyBone {
         let name = name.into_owned();
 
         Self { parent, pole_target, mirror, name, unk2, mode }
+    }
+}
+
+#[pyproto]
+impl<'p> PyObjectProtocol<'p> for PyBoneDatabase {
+    fn __repr__(&'p self) -> PyResult<String> {
+        Ok(format!(
+            "PyBoneDatabase({:X}): {} skeletons",
+            self.signature,
+            self.skeletons.len()
+        ))
+    }
+}
+
+#[pyproto]
+impl<'p> PyObjectProtocol<'p> for PySkeleton {
+    fn __repr__(&'p self) -> PyResult<String> {
+        Ok(format!(
+            "PySkeleton: {}, {} bone(s)",
+            self.name,
+            self.bones.len(),
+        ))
+    }
+}
+
+#[pyproto]
+impl<'p> PyObjectProtocol<'p> for PyBone {
+    fn __repr__(&'p self) -> PyResult<String> {
+        Ok(format!(
+            "PyBone({} type {})",
+            self.name,
+            self.mode,
+        ))
     }
 }
 
