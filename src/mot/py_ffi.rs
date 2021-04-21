@@ -6,54 +6,38 @@ use super::*;
 
 #[pyclass]
 #[derive(Debug, Default, PartialEq, PartialOrd, Clone)]
-pub struct PyMotionInfo {
-    #[pyo3(get, set)]
-    name: String,
-    #[pyo3(get, set)]
-    id: u32,
-}
-
-#[pyclass]
-#[derive(Debug, Default, PartialEq, PartialOrd, Clone)]
 pub struct PyMotionSetInfo {
     #[pyo3(get, set)]
     name: String,
     #[pyo3(get, set)]
-    id: u32,
-    #[pyo3(get, set)]
-    mots: Vec<PyMotionInfo>,
+    mots: BTreeMap<u32, String>,
 }
 
 #[pyclass]
 #[derive(Debug)]
 pub struct PyMotionSetDatabase {
+    #[pyo3(get)]
+    pub signature: u32,
     #[pyo3(get, set)]
-    pub sets: Vec<PyMotionSetInfo>,
+    pub sets: BTreeMap<u32, PyMotionSetInfo>,
     #[pyo3(get, set)]
     pub bones: Vec<String>,
 }
 
-impl<'a> From<MotionInfo<'a>> for PyMotionInfo {
-    fn from(info: MotionInfo<'a>) -> Self {
-        let MotionInfo { name, id } = info;
-        Self { id, name: name.into_owned() }
-    }
-}
-
 impl<'a> From<MotionSetInfo<'a>> for PyMotionSetInfo {
     fn from(info: MotionSetInfo<'a>) -> Self {
-        let MotionSetInfo { name, id, mots } = info;
-        let mots = mots.into_iter().map(Into::into).collect();
-        Self { id, name: name.into_owned(), mots }
+        let MotionSetInfo { name, mots } = info;
+        let mots = mots.into_iter().map(|(x, y)| (x, y.into())).collect();
+        Self { name: name.into_owned(), mots }
     }
 }
 
 impl<'a> From<MotionSetDatabase<'a>> for PyMotionSetDatabase {
     fn from(db: MotionSetDatabase<'a>) -> Self {
-        let MotionSetDatabase { sets, bones } = db;
-        let sets = sets.into_iter().map(Into::into).collect();
+        let MotionSetDatabase { sets, bones, signature } = db;
+        let sets = sets.into_iter().map(|(x, y)| (x, y.into())).collect();
         let bones = bones.into_iter().map(Into::into).collect();
-        Self { sets, bones }
+        Self { signature: db.signature, sets, bones }
     }
 }
 
@@ -61,8 +45,7 @@ impl<'a> From<MotionSetDatabase<'a>> for PyMotionSetDatabase {
 impl<'p> PyObjectProtocol<'p> for PyMotionSetInfo {
     fn __repr__(&'p self) -> PyResult<String> {
         Ok(format!(
-            "PyMotionSetInfo({}: {}, {} mot(s))",
-            self.id,
+            "PyMotionSetInfo: {}, {} mot(s)",
             self.name,
             self.mots.len()
         ))
@@ -70,12 +53,13 @@ impl<'p> PyObjectProtocol<'p> for PyMotionSetInfo {
 }
 
 #[pyproto]
-impl<'p> PyObjectProtocol<'p> for PyMotionInfo {
+impl<'p> PyObjectProtocol<'p> for PyMotionSetDatabase {
     fn __repr__(&'p self) -> PyResult<String> {
         Ok(format!(
-            "PyMotionInfo({}: {})",
-            self.id,
-            self.name,
+            "PyMotionSetDatabase({:X}): {} sets, {} bones",
+            self.signature,
+            self.sets.len(),
+            self.bones.len(),
         ))
     }
 }
@@ -88,7 +72,7 @@ fn read_db(path: String) -> PyResult<PyMotionSetDatabase> {
     let mut file = File::open(path)?;
     let mut input = vec![];
     file.read_to_end(&mut input);
-    let (_, mot_db) = MotionSetDatabase::read(Endianness::Little)(&input).unwrap();
+    let (_, mot_db) = MotionSetDatabase::read(&input).unwrap();
     Ok(mot_db.into())
 }
 
@@ -96,7 +80,6 @@ fn read_db(path: String) -> PyResult<PyMotionSetDatabase> {
 fn mot(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     use crate::bone;
     m.add_wrapped(wrap_pyfunction!(read_db));
-    m.add_class::<PyMotionInfo>();
     m.add_class::<PyMotionSetInfo>();
     m.add_class::<PyMotionSetDatabase>();
 
