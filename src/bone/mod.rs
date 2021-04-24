@@ -36,7 +36,7 @@ pub struct Skeleton<'a> {
     pub motion_bone_names: Vec<Cow<'a, str>>,
 }
 
-#[derive(Debug, Default, PartialEq, PartialOrd, Clone)]
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Bone<'a> {
     pub mode: BoneType,
@@ -48,7 +48,7 @@ pub struct Bone<'a> {
 }
 
 #[int_enum(u8)]
-#[derive(Debug, SmartDefault, PartialEq, PartialOrd, Copy, Clone)]
+#[derive(Debug, SmartDefault, PartialEq, Eq, PartialOrd, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 //Need to explictly set variant numbers for int_enum to work
 pub enum BoneType {
