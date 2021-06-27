@@ -18,7 +18,7 @@ log = "0.4.8"
 serde = { version="1.0.102", optional=true, features=["derive"]}
 cookie-factory = "0.3.0"
 nom_ext = { git="https://github.com/Waelwindows/nom_ext" }
-pyo3 = { version = "0.10.1", optional = true }
+pyo3 = { version = "0.13.2", optional = true }
 
 [dev-dependencies]
 criterion = "0.3.0"
