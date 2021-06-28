@@ -77,7 +77,7 @@ fn read_db(path: String) -> PyResult<PyMotionSetDatabase> {
 }
 
 #[pymodule]
-fn mot(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+fn motset(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     use crate::bone;
     m.add_wrapped(wrap_pyfunction!(read_db));
     m.add_class::<PyMotionSetInfo>();
