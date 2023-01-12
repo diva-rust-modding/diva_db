@@ -1,6 +1,5 @@
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
-use pyo3::PyObjectProtocol;
 
 use super::*;
 
@@ -45,33 +44,60 @@ pub struct PyBone {
     #[pyo3(get, set)]
     pub unk2: u8,
     #[pyo3(get, set)]
-    pub name: String
+    pub name: String,
 }
 
 impl From<BoneDatabase<'_>> for PyBoneDatabase {
     fn from(bonedb: BoneDatabase<'_>) -> Self {
-        let BoneDatabase { signature, skeletons } = bonedb;
+        let BoneDatabase {
+            signature,
+            skeletons,
+        } = bonedb;
 
         let skeletons = skeletons.into_iter().map(Into::into).collect();
 
-        Self { signature, skeletons }
+        Self {
+            signature,
+            skeletons,
+        }
     }
 }
 impl From<Skeleton<'_>> for PySkeleton {
     fn from(skel: Skeleton<'_>) -> Self {
-        let Skeleton { name, bones, pos, parent_ids, object_bone_names, motion_bone_names } = skel;
+        let Skeleton {
+            name,
+            bones,
+            pos,
+            parent_ids,
+            object_bone_names,
+            motion_bone_names,
+        } = skel;
 
         let name = name.into_owned();
         let bones = bones.into_iter().map(Into::into).collect();
         let object_bone_names = object_bone_names.into_iter().map(Into::into).collect();
         let motion_bone_names = motion_bone_names.into_iter().map(Into::into).collect();
 
-        Self { name, bones, pos, parent_ids, object_bone_names, motion_bone_names }
+        Self {
+            name,
+            bones,
+            pos,
+            parent_ids,
+            object_bone_names,
+            motion_bone_names,
+        }
     }
 }
 impl From<Bone<'_>> for PyBone {
     fn from(bone: Bone<'_>) -> Self {
-        let Bone { parent, pole_target, mirror, unk2, name, mode } = bone;
+        let Bone {
+            parent,
+            pole_target,
+            mirror,
+            unk2,
+            name,
+            mode,
+        } = bone;
 
         // let parent = parent.unwrap_or(255);
         // let pole_target = pole_target.unwrap_or(255);
@@ -80,13 +106,20 @@ impl From<Bone<'_>> for PyBone {
         let mode = mode as u8;
         let name = name.into_owned();
 
-        Self { parent, pole_target, mirror, name, unk2, mode }
+        Self {
+            parent,
+            pole_target,
+            mirror,
+            name,
+            unk2,
+            mode,
+        }
     }
 }
 
-#[pyproto]
-impl<'p> PyObjectProtocol<'p> for PyBoneDatabase {
-    fn __repr__(&'p self) -> PyResult<String> {
+#[pymethods]
+impl PyBoneDatabase {
+    fn __repr__(&self) -> PyResult<String> {
         Ok(format!(
             "PyBoneDatabase({:X}): {} skeletons",
             self.signature,
@@ -95,9 +128,9 @@ impl<'p> PyObjectProtocol<'p> for PyBoneDatabase {
     }
 }
 
-#[pyproto]
-impl<'p> PyObjectProtocol<'p> for PySkeleton {
-    fn __repr__(&'p self) -> PyResult<String> {
+#[pymethods]
+impl PySkeleton {
+    fn __repr__(&self) -> PyResult<String> {
         Ok(format!(
             "PySkeleton: {}, {} bone(s)",
             self.name,
@@ -106,14 +139,9 @@ impl<'p> PyObjectProtocol<'p> for PySkeleton {
     }
 }
 
-#[pyproto]
-impl<'p> PyObjectProtocol<'p> for PyBone {
-    fn __repr__(&'p self) -> PyResult<String> {
-        Ok(format!(
-            "PyBone({} type {})",
-            self.name,
-            self.mode,
-        ))
+impl PyBone {
+    fn __repr__(&self) -> PyResult<String> {
+        Ok(format!("PyBone({} type {})", self.name, self.mode,))
     }
 }
 
@@ -129,13 +157,13 @@ fn read_db(path: String) -> PyResult<PyBoneDatabase> {
     Ok(bone_db.into())
 }
 
-#[pymodule]
-fn bone(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+pub(crate) fn bone(py: Python<'_>) -> PyResult<&PyModule> {
     use crate::bone;
+    let m = PyModule::new(py, "bone")?;
     m.add_wrapped(wrap_pyfunction!(read_db));
     m.add_class::<PyBoneDatabase>();
     m.add_class::<PySkeleton>();
     m.add_class::<PyBone>();
 
-    Ok(())
+    Ok(m)
 }

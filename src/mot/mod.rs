@@ -1,17 +1,17 @@
 use nom_ext::*;
+#[cfg(feature = "pyo3")]
+use pyo3::{prelude::*, wrap_pyfunction};
 #[cfg(feature = "serde")]
 use serde::*;
-#[cfg(feature="pyo3")]
-use pyo3::{prelude::*, wrap_pyfunction, PyObjectProtocol};
 
 use std::{borrow::Cow, collections::BTreeMap};
 
 use super::*;
 
+#[cfg(feature = "pyo3")]
+pub mod py_ffi;
 #[cfg(test)]
 mod tests;
-#[cfg(feature="pyo3")]
-pub mod py_ffi;
 
 // #[cfg_attr(feature = "pyo3", pyclass)]
 #[derive(Debug, Default, PartialEq, PartialOrd)]
@@ -29,11 +29,11 @@ pub struct MotionSetDatabase<'a> {
     pub bones: Vec<Cow<'a, str>>,
 }
 
+use nom::bytes::complete::*;
+use nom::combinator::*;
 use nom::multi::count;
 use nom::number::complete::*;
 use nom::number::Endianness;
-use nom::bytes::complete::*;
-use nom::combinator::*;
 use nom::IResult;
 
 impl<'a> MotionSetInfo<'a> {
@@ -46,10 +46,13 @@ impl<'a> MotionSetInfo<'a> {
             let (i, mot_ids_offset) = u32_usize(endian)(i)?;
 
             let (_, mot_ids) = at_offset(mot_ids_offset, count(le_u32, mot_count))(i0)?;
-            let (_, mot_names) = at_offset(mot_name_table_offset, count(offset_string(i0, endian), mot_count))(i0)?;
+            let (_, mot_names) = at_offset(
+                mot_name_table_offset,
+                count(offset_string(i0, endian), mot_count),
+            )(i0)?;
 
             let mots = mot_ids.into_iter().zip(mot_names.into_iter()).collect();
-            Ok((i, Self { name, mots}))
+            Ok((i, Self { name, mots }))
         }
     }
 }
@@ -64,13 +67,24 @@ impl<'a> MotionSetDatabase<'a> {
         let (i, bone_name_table_offset) = u32_usize(endian)(i)?;
         let (i, bone_name_count) = u32_usize(endian)(i)?;
 
-        let (_, sets) = at_offset(set_infos_off, count(MotionSetInfo::read(i0), set_infos_cnt))(i0)?;
+        let (_, sets) =
+            at_offset(set_infos_off, count(MotionSetInfo::read(i0), set_infos_cnt))(i0)?;
         let (_, set_ids) = at_offset(set_ids_off, count(le_u32, set_infos_cnt))(i0)?;
 
         let sets = set_ids.into_iter().zip(sets.into_iter()).collect();
 
-        let (_, bones) = at_offset(bone_name_table_offset, count(offset_string(i0, endian), bone_name_count))(i0)?;
+        let (_, bones) = at_offset(
+            bone_name_table_offset,
+            count(offset_string(i0, endian), bone_name_count),
+        )(i0)?;
 
-        Ok((i, Self { signature, sets, bones}))
+        Ok((
+            i,
+            Self {
+                signature,
+                sets,
+                bones,
+            },
+        ))
     }
 }

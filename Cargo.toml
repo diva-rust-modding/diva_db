@@ -8,7 +8,7 @@ edition = "2018"
 
 [lib]
 name = "diva_db"
-crate-type = ["lib", "dylib"]
+crate-type = ["lib", "cdylib"]
 
 [dependencies]
 nom = "5.0.1"
@@ -18,13 +18,13 @@ log = "0.4.8"
 serde = { version="1.0.102", optional=true, features=["derive"]}
 cookie-factory = "0.3.0"
 nom_ext = { git="https://github.com/Waelwindows/nom_ext" }
-pyo3 = { version = "0.13.2", optional = true }
+pyo3 = { version = "0.17.3", optional = true, features = ["extension-module", "abi3-py37", "generate-import-lib"] }
 
 [dev-dependencies]
 criterion = "0.3.0"
 env_logger = "0.7.1"
 serde_json = "1.0.41"
-bvh_anim = {version="*", git="https://github.com/Waelwindows/bvh_anim.git"}
+# bvh_anim = {version="*", git="https://github.com/Waelwindows/bvh_anim.git"}
 mint = "0.5.4"
 bstr = "0.2.11"
 

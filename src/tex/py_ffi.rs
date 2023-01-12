@@ -1,6 +1,5 @@
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
-use pyo3::PyObjectProtocol;
 
 use std::collections::BTreeMap;
 
@@ -15,7 +14,11 @@ pub struct PyTextureDatabase {
 
 impl<'a> From<TextureDatabase<'a>> for PyTextureDatabase {
     fn from(db: TextureDatabase<'a>) -> Self {
-        let entries = db.entries.into_iter().map(|(k, v)| (k, v.into_owned())).collect();
+        let entries = db
+            .entries
+            .into_iter()
+            .map(|(k, v)| (k, v.into_owned()))
+            .collect();
         Self { entries }
     }
 }
@@ -27,10 +30,9 @@ impl<'a> From<PyTextureDatabase> for TextureDatabase<'a> {
     }
 }
 
-#[pyproto]
-impl<'p> PyObjectProtocol<'p> for PyTextureDatabase {
-
-    fn __repr__(&'p self) -> PyResult<String> {
+#[pymethods]
+impl PyTextureDatabase {
+    fn __repr__(&self) -> PyResult<String> {
         Ok(format!(
             "PyTextureDatabase: {} textures",
             self.entries.len(),
@@ -50,11 +52,10 @@ fn read_db(path: String) -> PyResult<PyTextureDatabase> {
     Ok(bone_db.into())
 }
 
-#[pymodule]
-fn tex(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+pub(crate) fn tex(py: Python<'_>) -> PyResult<&PyModule> {
     use crate::bone;
+    let m = PyModule::new(py, "tex")?;
     m.add_wrapped(wrap_pyfunction!(read_db));
     m.add_class::<PyTextureDatabase>();
-
-    Ok(())
+    Ok(m)
 }

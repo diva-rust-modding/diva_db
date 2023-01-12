@@ -1,6 +1,5 @@
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
-use pyo3::PyObjectProtocol;
 
 use super::*;
 
@@ -28,22 +27,33 @@ impl<'a> From<MotionSetInfo<'a>> for PyMotionSetInfo {
     fn from(info: MotionSetInfo<'a>) -> Self {
         let MotionSetInfo { name, mots } = info;
         let mots = mots.into_iter().map(|(x, y)| (x, y.into())).collect();
-        Self { name: name.into_owned(), mots }
+        Self {
+            name: name.into_owned(),
+            mots,
+        }
     }
 }
 
 impl<'a> From<MotionSetDatabase<'a>> for PyMotionSetDatabase {
     fn from(db: MotionSetDatabase<'a>) -> Self {
-        let MotionSetDatabase { sets, bones, signature } = db;
+        let MotionSetDatabase {
+            sets,
+            bones,
+            signature,
+        } = db;
         let sets = sets.into_iter().map(|(x, y)| (x, y.into())).collect();
         let bones = bones.into_iter().map(Into::into).collect();
-        Self { signature: db.signature, sets, bones }
+        Self {
+            signature: db.signature,
+            sets,
+            bones,
+        }
     }
 }
 
-#[pyproto]
-impl<'p> PyObjectProtocol<'p> for PyMotionSetInfo {
-    fn __repr__(&'p self) -> PyResult<String> {
+#[pymethods]
+impl PyMotionSetInfo {
+    fn __repr__(&self) -> PyResult<String> {
         Ok(format!(
             "PyMotionSetInfo: {}, {} mot(s)",
             self.name,
@@ -52,9 +62,9 @@ impl<'p> PyObjectProtocol<'p> for PyMotionSetInfo {
     }
 }
 
-#[pyproto]
-impl<'p> PyObjectProtocol<'p> for PyMotionSetDatabase {
-    fn __repr__(&'p self) -> PyResult<String> {
+#[pymethods]
+impl PyMotionSetDatabase {
+    fn __repr__(&self) -> PyResult<String> {
         Ok(format!(
             "PyMotionSetDatabase({:X}): {} sets, {} bones",
             self.signature,
@@ -76,12 +86,11 @@ fn read_db(path: String) -> PyResult<PyMotionSetDatabase> {
     Ok(mot_db.into())
 }
 
-#[pymodule]
-fn motset(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+pub(crate) fn motset(py: Python<'_>) -> PyResult<&PyModule> {
     use crate::bone;
+    let m = PyModule::new(py, "motset")?;
     m.add_wrapped(wrap_pyfunction!(read_db));
     m.add_class::<PyMotionSetInfo>();
     m.add_class::<PyMotionSetDatabase>();
-
-    Ok(())
+    Ok(m)
 }
