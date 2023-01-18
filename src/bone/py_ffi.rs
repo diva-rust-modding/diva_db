@@ -23,6 +23,7 @@ pub struct PySkeleton {
     pub pos: Vec<Vec3>,
     #[pyo3(get, set)]
     pub parent_ids: Vec<i16>,
+    pub heel_height: f32,
 
     #[pyo3(get, set)]
     pub object_bone_names: Vec<String>,
@@ -71,6 +72,7 @@ impl From<Skeleton<'_>> for PySkeleton {
             parent_ids,
             object_bone_names,
             motion_bone_names,
+            heel_height,
         } = skel;
 
         let name = name.into_owned();
@@ -85,6 +87,7 @@ impl From<Skeleton<'_>> for PySkeleton {
             parent_ids,
             object_bone_names,
             motion_bone_names,
+            heel_height,
         }
     }
 }
