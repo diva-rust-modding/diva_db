@@ -30,11 +30,11 @@ mod read {
         let skel = Skeleton::read(INPUT)(&INPUT[0x180BC..]).unwrap().1;
         let bone = Bone {
             name: "n_hara_cp".into(),
-            mode: BoneType::Type3,
+            mode: BoneType::PositionRotation,
             parent: None,
             pole_target: None,
             mirror: None,
-            unk2: 0
+            unk2: 0,
         };
         assert_eq!(skel.bones[0], bone);
         assert_eq!(skel.bones.len(), 177);
@@ -47,11 +47,11 @@ mod read {
         let bone = Bone::read(INPUT)(&INPUT[0x16774..]).unwrap().1;
         let bone_res = Bone {
             name: "n_hara_cp".into(),
-            mode: BoneType::Type3,
+            mode: BoneType::PositionRotation,
             parent: None,
             pole_target: None,
             mirror: None,
-            unk2: 0
+            unk2: 0,
         };
         assert_eq!(bone, bone_res);
     }

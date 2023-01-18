@@ -170,10 +170,10 @@ impl TryFrom<u8> for BoneType {
             0 => Ok(Self::Rotation),
             1 => Ok(Self::Type1),
             2 => Ok(Self::Position),
-            3 => Ok(Self::Type3),
-            4 => Ok(Self::Type4),
-            5 => Ok(Self::Type5),
-            6 => Ok(Self::Type6),
+            3 => Ok(Self::PositionRotation),
+            4 => Ok(Self::HeadIk),
+            5 => Ok(Self::ArmIk),
+            6 => Ok(Self::LegIk),
             _ => Err(()),
         }
     }
