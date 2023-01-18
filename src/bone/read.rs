@@ -79,7 +79,7 @@ impl<'a> Skeleton<'a> {
             let count_ptr = tuple((le_usize, le_usize));
 
             let (i, (pos_cnt, pos_ptr)) = count_ptr(i)?;
-            let (i, _unk_ptr) = le_usize(i)?;
+            let (i, heel_ptr) = le_usize(i)?;
             let (i, (obj_cnt, obj_ptr)) = count_ptr(i)?;
             let (i, (mot_cnt, mot_ptr)) = count_ptr(i)?;
             let (i, parent_id_ptr) = le_usize(i)?;
@@ -106,6 +106,7 @@ impl<'a> Skeleton<'a> {
             trace!("[SUCESS] Bone read");
             let vec3 = map(tuple((le_f32, le_f32, le_f32)), |(x, y, z)| [x, y, z]);
             let (_, pos) = count(vec3, pos_cnt)(&i0[pos_ptr..])?;
+            let (_, heel_height) = le_f32(&i0[heel_ptr..])?;
             //println!("vec3: {:.02?}", pos);
             trace!("[SUCESS] Position read");
             let (_, object_bone_names) = count(offset_string(i0), obj_cnt)(&i0[obj_ptr..])?;
@@ -123,6 +124,7 @@ impl<'a> Skeleton<'a> {
                 object_bone_names,
                 motion_bone_names,
                 parent_ids,
+                heel_height,
                 ..Default::default()
             };
             Ok((i, skel))

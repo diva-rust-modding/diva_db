@@ -32,6 +32,7 @@ pub struct Skeleton<'a> {
     pub bones: Vec<Bone<'a>>,
     pub pos: Vec<Vec3>,
     pub parent_ids: Vec<i16>,
+    pub heel_height: f32,
 
     pub object_bone_names: Vec<Cow<'a, str>>,
     pub motion_bone_names: Vec<Cow<'a, str>>,

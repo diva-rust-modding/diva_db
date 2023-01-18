@@ -40,6 +40,7 @@ mod read {
         assert_eq!(skel.bones.len(), 177);
         assert_eq!(skel.pos[0], [0., 0., 0.]);
         assert_eq!(skel.parent_ids[0], -1);
+        assert_eq!(skel.heel_height, 0.103);
     }
 
     #[test]
