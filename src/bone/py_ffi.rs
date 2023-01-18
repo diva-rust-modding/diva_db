@@ -34,7 +34,7 @@ pub struct PySkeleton {
 #[derive(Debug, Default, PartialEq, PartialOrd, Clone)]
 pub struct PyBone {
     #[pyo3(get, set)]
-    pub mode: u8,
+    pub mode: super::BoneType,
     #[pyo3(get, set)]
     pub parent: Option<u8>,
     #[pyo3(get, set)]
@@ -103,7 +103,6 @@ impl From<Bone<'_>> for PyBone {
         // let pole_target = pole_target.unwrap_or(255);
         // let mirror = mirror.unwrap_or(255);
 
-        let mode = mode as u8;
         let name = name.into_owned();
 
         Self {
@@ -141,7 +140,7 @@ impl PySkeleton {
 
 impl PyBone {
     fn __repr__(&self) -> PyResult<String> {
-        Ok(format!("PyBone({} type {})", self.name, self.mode,))
+        Ok(format!("PyBone({} type {:?})", self.name, self.mode,))
     }
 }
 

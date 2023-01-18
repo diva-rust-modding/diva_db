@@ -9,9 +9,12 @@ use smart_default::*;
 
 use std::borrow::Cow;
 
-mod read;
-#[cfg(feature="pyo3")]
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
+
+#[cfg(feature = "pyo3")]
 pub mod py_ffi;
+mod read;
 #[cfg(test)]
 mod tests;
 
@@ -50,6 +53,7 @@ pub struct Bone<'a> {
 #[int_enum(u8)]
 #[derive(Debug, SmartDefault, PartialEq, Eq, PartialOrd, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "pyo3", pyclass)]
 //Need to explictly set variant numbers for int_enum to work
 pub enum BoneType {
     #[default]
