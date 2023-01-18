@@ -12,8 +12,6 @@ crate-type = ["lib", "cdylib"]
 
 [dependencies]
 nom = "5.0.1"
-smart-default = "0.5.2"
-int-enum = "0.1.0"
 log = "0.4.8"
 serde = { version="1.0.102", optional=true, features=["derive"]}
 cookie-factory = "0.3.0"

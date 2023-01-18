@@ -1,3 +1,5 @@
+use std::convert::{TryFrom, TryInto};
+
 use super::*;
 
 fn read_at<'a, F, O>(i0: &'a [u8], f: F) -> impl Fn(&'a [u8]) -> IResult<&'a [u8], O>
@@ -133,10 +135,10 @@ impl<'a> Bone<'a> {
         use nom::combinator::map_opt;
         move |i: &'a [u8]| {
             trace!("Mode read: {}", i[0]);
-            let (_, mode) = map_opt(le_u8, |x| BoneType::from_int(x))(i)?;
+            let (_, mode) = map_opt(le_u8, |x| x.try_into().ok())(i)?;
             let parent = i[1] != 0;
             let parent = if parent { Some(i[2]) } else { None };
-            let pole_target = if i[3] != 0 { Some(i[3] )} else { None };
+            let pole_target = if i[3] != 0 { Some(i[3]) } else { None };
             let mirror = if i[4] != 255 { Some(i[4]) } else { None };
             let has_unk = i[5] != 0;
             let unk2 = if has_unk { Some(i[6]) } else { None };
@@ -156,6 +158,23 @@ impl<'a> Bone<'a> {
                     name,
                 },
             ))
+        }
+    }
+}
+
+impl TryFrom<u8> for BoneType {
+    type Error = ();
+
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::Rotation),
+            1 => Ok(Self::Type1),
+            2 => Ok(Self::Position),
+            3 => Ok(Self::Type3),
+            4 => Ok(Self::Type4),
+            5 => Ok(Self::Type5),
+            6 => Ok(Self::Type6),
+            _ => Err(()),
         }
     }
 }

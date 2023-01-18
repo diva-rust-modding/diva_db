@@ -1,11 +1,9 @@
 use crate::*;
-use int_enum::*;
 use nom::{
     bytes::complete::is_not, combinator::map, multi::*, number::complete::*, sequence::tuple, *,
 };
 #[cfg(feature = "serde")]
 use serde::*;
-use smart_default::*;
 
 use std::borrow::Cow;
 
@@ -50,11 +48,9 @@ pub struct Bone<'a> {
     pub name: Cow<'a, str>,
 }
 
-#[int_enum(u8)]
-#[derive(Debug, SmartDefault, PartialEq, Eq, PartialOrd, Copy, Clone)]
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Copy, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "pyo3", pyclass)]
-//Need to explictly set variant numbers for int_enum to work
 pub enum BoneType {
     #[default]
     Rotation = 0,
