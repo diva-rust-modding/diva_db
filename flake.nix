@@ -24,7 +24,7 @@
 
         src = ./.;
 
-        buildFeatures = [ "ddsfile " "image" "dcv-color-primitives" ];
+        buildFeatures = [ "serde" "pyo3" ];
 
         cargoLock = {
           # Why I yes, I would like not writing the hash of my Cargo.lock very much.
