@@ -1,5 +1,8 @@
 /target
 **/*.rs.bk
-Cargo.lock
 *.bvh
 tags
+
+# Nix stuff
+.direnv/
+result
