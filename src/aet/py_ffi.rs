@@ -1,6 +1,8 @@
+use pyo3::prelude::*;
+
 use super::*;
 use crate::py_ffi::*;
-use pyo3::prelude::*;
+use crate::spr::{SprDb, SprDbSet};
 
 #[pymethods]
 impl AetDb {
@@ -11,6 +13,10 @@ impl AetDb {
 
 #[pymethods]
 impl AetDbSet {
+    fn get_spr_set(&self, db: SprDb) -> Option<SprDbSet> {
+        db.sets.get(&self.spr_set_id).cloned()
+    }
+
     fn __repr__(&self) -> PyResult<String> {
         Ok(format!(
             "AetDbSet({}: {} @ {:?}): {} scene(s)",
