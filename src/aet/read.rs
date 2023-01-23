@@ -32,45 +32,43 @@ struct AetDbSceneReader {
 }
 
 impl AetDb {
-    pub fn read(path: String, spr_db: &spr::SprDb) -> Option<Self> {
+    pub fn read(path: String) -> Option<Self> {
         let bytes = std::fs::read(path).ok()?;
         let mut reader = Cursor::new(bytes);
         let mut aet_db: AetDbReader = reader.read_ne().ok()?;
-        let mut out = Vec::with_capacity(aet_db.set_count as usize);
+        let mut out = BTreeMap::new();
 
         aet_db.sets.sort_by(|a, b| a.index.cmp(&b.index));
         for set in aet_db.sets.iter() {
-            let spr_set = match spr_db.get(set.spr_set_id) {
-                Some(spr_set) => spr_set,
-                None => continue,
-            };
-            let spr_set = spr_set.to_owned();
-            out.push(AetDbSet {
-                id: set.id,
-                name: set.name.to_string(),
-                filename: set.filename.to_string(),
-                index: set.index,
-                spr_set: spr_set,
-                scenes: vec![],
-            });
+            out.insert(
+                set.id,
+                AetDbSet {
+                    name: set.name.to_string(),
+                    filename: set.filename.to_string(),
+                    spr_set_id: set.spr_set_id,
+                    scenes: BTreeMap::new(),
+                    index: set.index,
+                },
+            );
         }
 
         for scene in aet_db.scenes.iter() {
-            let aet_set = match out.get_mut(scene.set_index as usize) {
+            let aet_set = match out
+                .iter_mut()
+                .find(|(_, v)| v.index == scene.set_index.into())
+            {
                 Some(aet_set) => aet_set,
                 None => continue,
             };
-            aet_set.scenes.push(AetDbScene {
-                id: scene.id,
-                name: scene.name.to_string(),
-                index: scene.index,
-            });
+            aet_set.1.scenes.insert(
+                scene.id,
+                AetDbScene {
+                    name: scene.name.to_string(),
+                    index: scene.index,
+                },
+            );
         }
 
         Some(Self { sets: out })
-    }
-
-    pub fn get(&self, id: u32) -> Option<&AetDbSet> {
-        self.sets.iter().find(|set| set.id == id)
     }
 }

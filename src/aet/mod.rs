@@ -1,25 +1,25 @@
+use std::collections::BTreeMap;
+
 use crate::spr;
 
 mod read;
 
 #[derive(Debug, Clone)]
 pub struct AetDb {
-    pub sets: Vec<AetDbSet>,
+    pub sets: BTreeMap<u32, AetDbSet>,
 }
 
 #[derive(Debug, Clone)]
 pub struct AetDbSet {
-    pub id: u32,
     pub name: String,
     pub filename: String,
-    pub index: i32,
-    pub spr_set: spr::SprDbSet,
-    pub scenes: Vec<AetDbScene>,
+    pub spr_set_id: u32,
+    pub scenes: BTreeMap<u32, AetDbScene>,
+    index: i32,
 }
 
 #[derive(Debug, Clone)]
 pub struct AetDbScene {
-    pub id: u32,
     pub name: String,
-    pub index: u16,
+    index: u16,
 }
