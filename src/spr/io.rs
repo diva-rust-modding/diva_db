@@ -73,3 +73,19 @@ impl SprDb {
         Some(Self { sets: out })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: &[u8] = include_bytes!("../../assets/aft_spr_db.bin");
+
+    #[test]
+    fn read() {
+        let mut reader = std::io::Cursor::new(INPUT);
+        let db = SprDb::read(reader).unwrap();
+        assert_eq!(db.sets.len(), 2983);
+        assert_eq!(db.sets.values().map(|x| x.sprites.len()).max(), Some(344));
+        assert_eq!(db.sets.values().map(|x| x.textures.len()).max(), Some(99));
+    }
+}
