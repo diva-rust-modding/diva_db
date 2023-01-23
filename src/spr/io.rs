@@ -31,46 +31,68 @@ struct SprDbSpriteReader {
     set_index: u16,
 }
 
-impl SprDb {
-    pub fn read<R: Read + Seek>(mut reader: R) -> Option<Self> {
-        let mut spr_db: SprDbReader = reader.read_ne().ok()?;
-        let mut out = BTreeMap::new();
-
-        spr_db.sets.sort_by(|a, b| a.index.cmp(&b.index));
-        for set in spr_db.sets.iter() {
-            out.insert(
-                set.id,
-                SprDbSet {
-                    name: set.name.to_string(),
-                    filename: set.filename.to_string(),
-                    sprites: BTreeMap::new(),
-                    textures: BTreeMap::new(),
-                    index: set.index,
-                },
-            );
-        }
-
-        for sprite in spr_db.sprites.iter() {
-            let spr_set_index = (sprite.set_index & 0xFFF) as usize;
-            let entry = SprDbEntry {
-                name: sprite.name.to_string(),
-                index: sprite.index,
-            };
-            let spr_set = match out
-                .iter_mut()
-                .find(|(_, v)| v.index == spr_set_index as i32)
-            {
-                Some(spr_set) => spr_set,
-                None => continue,
-            };
-            if sprite.set_index & 0x1000 == 0x1000 {
-                spr_set.1.textures.insert(sprite.id, entry);
-            } else {
-                spr_set.1.sprites.insert(sprite.id, entry);
+impl From<SprDbReader> for SprDb {
+    fn from(db: SprDbReader) -> Self {
+        let sets = db.sets.into_inner();
+        let mut sets: BTreeMap<u32, _> = sets.into_iter().map(Into::into).collect();
+        let sprites = db.sprites.into_inner();
+        for sprite in sprites.into_iter() {
+            let spr_set_index = (sprite.set_index & 0xFFF) as i32;
+            let set = sets.values_mut().find(|x| x.index == spr_set_index);
+            if let Some(set) = set {
+                if sprite.is_texture() {
+                    set.textures.insert(sprite.id, sprite.into());
+                } else {
+                    set.sprites.insert(sprite.id, sprite.into());
+                }
             }
         }
+        Self { sets }
+    }
+}
 
-        Some(Self { sets: out })
+impl SprDbSpriteReader {
+    const fn is_texture(&self) -> bool {
+        self.set_index & 0x1000 == 0x1000
+    }
+}
+
+impl From<SprDbSetReader> for SprDbSet {
+    fn from(set: SprDbSetReader) -> Self {
+        Self {
+            index: set.index,
+            name: set.name.to_string(),
+            filename: set.filename.to_string(),
+            sprites: Default::default(),
+            textures: Default::default(),
+        }
+    }
+}
+
+impl Into<(u32, SprDbSet)> for SprDbSetReader {
+    fn into(self) -> (u32, SprDbSet) {
+        (self.id, self.into())
+    }
+}
+
+impl From<SprDbSpriteReader> for SprDbEntry {
+    fn from(sprite: SprDbSpriteReader) -> Self {
+        Self {
+            index: sprite.index,
+            name: sprite.name.to_string(),
+        }
+    }
+}
+
+impl Into<(u32, SprDbEntry)> for SprDbSpriteReader {
+    fn into(self) -> (u32, SprDbEntry) {
+        (self.id, self.into())
+    }
+}
+
+impl SprDb {
+    pub fn read<R: Read + Seek>(mut reader: R) -> BinResult<Self> {
+        reader.read_ne::<SprDbReader>().map(Into::into)
     }
 }
 
