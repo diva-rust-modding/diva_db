@@ -71,3 +71,18 @@ impl AetDb {
         Some(Self { sets: out })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: &[u8] = include_bytes!("../../assets/aft_aet_db.bin");
+
+    #[test]
+    fn read() {
+        let mut reader = std::io::Cursor::new(INPUT);
+        let db = AetDb::read(reader).unwrap();
+        assert_eq!(db.sets.len(), 1063);
+        assert_eq!(db.sets.values().map(|x| x.scenes.len()).max(), Some(2));
+    }
+}
