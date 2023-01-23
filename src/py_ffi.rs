@@ -5,6 +5,7 @@ use pyo3::PyErr;
 
 use super::mot::py_ffi::*;
 use super::tex::py_ffi::*;
+use crate::aet::py_ffi::*;
 use crate::bone::py_ffi::*;
 use crate::spr::py_ffi::*;
 
@@ -28,6 +29,7 @@ fn diva_db(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_submodule(tex(py)?);
     m.add_submodule(motset(py)?);
     m.add_submodule(spr(py)?);
+    m.add_submodule(aet(py)?);
 
     Ok(())
 }

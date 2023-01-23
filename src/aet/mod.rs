@@ -1,18 +1,24 @@
+#[cfg(feature = "pyo3")]
+use pyo3::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 use std::collections::BTreeMap;
 
 mod io;
+#[cfg(feature = "pyo3")]
+pub mod py_ffi;
 
 #[derive(Debug, Default, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "pyo3", pyclass(get_all, set_all))]
 pub struct AetDb {
     pub sets: BTreeMap<u32, AetDbSet>,
 }
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "pyo3", pyclass(get_all, set_all))]
 pub struct AetDbSet {
     #[cfg_attr(feature = "serde", serde(skip))]
     index: i32,
@@ -24,6 +30,7 @@ pub struct AetDbSet {
 
 #[derive(Debug, Default, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "pyo3", pyclass(get_all, set_all))]
 pub struct AetDbScene {
     #[cfg_attr(feature = "serde", serde(skip))]
     index: u16,
