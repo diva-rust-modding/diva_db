@@ -1,3 +1,4 @@
+use binrw::io::{Read, Seek};
 use binrw::prelude::*;
 use binrw::*;
 use std::io::Cursor;
@@ -31,9 +32,7 @@ struct SprDbSpriteReader {
 }
 
 impl SprDb {
-    pub fn read(path: String) -> Option<Self> {
-        let bytes = std::fs::read(path).ok()?;
-        let mut reader = Cursor::new(bytes);
+    pub fn read<R: Read + Seek>(mut reader: R) -> Option<Self> {
         let mut spr_db: SprDbReader = reader.read_ne().ok()?;
         let mut out = BTreeMap::new();
 
