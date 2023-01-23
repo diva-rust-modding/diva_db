@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-mod read;
+mod io;
 
 #[derive(Debug, Clone)]
 pub struct SprDb {

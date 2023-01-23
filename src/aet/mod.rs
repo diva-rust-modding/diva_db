@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use crate::spr;
 
-mod read;
+mod io;
 
 #[derive(Debug, Clone)]
 pub struct AetDb {
