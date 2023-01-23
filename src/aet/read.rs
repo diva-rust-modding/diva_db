@@ -32,43 +32,57 @@ struct AetDbSceneReader {
     set_index: u16,
 }
 
+impl From<AetDbReader> for AetDb {
+    fn from(db: AetDbReader) -> Self {
+        let sets = db.sets.into_inner();
+        let scenes = db.scenes.into_inner();
+        let mut sets: BTreeMap<u32, AetDbSet> = sets.into_iter().map(Into::into).collect();
+        for scene in scenes.into_iter() {
+            if let Some(set) = sets.get_mut(&scene.set_index.into()) {
+                set.scenes.insert(scene.id, scene.into());
+            }
+        }
+        Self { sets }
+    }
+}
+
+impl From<AetDbSetReader> for AetDbSet {
+    fn from(set: AetDbSetReader) -> Self {
+        Self {
+            name: set.name.to_string(),
+            filename: set.filename.to_string(),
+            spr_set_id: set.spr_set_id,
+            scenes: BTreeMap::new(),
+            index: set.index,
+        }
+    }
+}
+
+impl Into<(u32, AetDbSet)> for AetDbSetReader {
+    fn into(self) -> (u32, AetDbSet) {
+        (self.id, AetDbSet::from(self))
+    }
+}
+
+impl From<AetDbSceneReader> for AetDbScene {
+    fn from(scene: AetDbSceneReader) -> Self {
+        AetDbScene {
+            name: scene.name.to_string(),
+            index: scene.index,
+        }
+    }
+}
+
+// Orphan rules pervent us from writing using `From<_>`
+impl Into<(u32, AetDbScene)> for AetDbSceneReader {
+    fn into(self) -> (u32, AetDbScene) {
+        (self.id, AetDbScene::from(self))
+    }
+}
+
 impl AetDb {
-    pub fn read<R: Read + Seek>(mut reader: R) -> Option<Self> {
-        let mut aet_db: AetDbReader = reader.read_ne().ok()?;
-        let mut out = BTreeMap::new();
-
-        aet_db.sets.sort_by(|a, b| a.index.cmp(&b.index));
-        for set in aet_db.sets.iter() {
-            out.insert(
-                set.id,
-                AetDbSet {
-                    name: set.name.to_string(),
-                    filename: set.filename.to_string(),
-                    spr_set_id: set.spr_set_id,
-                    scenes: BTreeMap::new(),
-                    index: set.index,
-                },
-            );
-        }
-
-        for scene in aet_db.scenes.iter() {
-            let aet_set = match out
-                .iter_mut()
-                .find(|(_, v)| v.index == scene.set_index.into())
-            {
-                Some(aet_set) => aet_set,
-                None => continue,
-            };
-            aet_set.1.scenes.insert(
-                scene.id,
-                AetDbScene {
-                    name: scene.name.to_string(),
-                    index: scene.index,
-                },
-            );
-        }
-
-        Some(Self { sets: out })
+    pub fn read<R: Read + Seek>(mut reader: R) -> BinResult<Self> {
+        reader.read_ne::<AetDbReader>().map(Into::into)
     }
 }
 
