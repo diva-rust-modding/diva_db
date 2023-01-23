@@ -35,34 +35,39 @@ impl SprDb {
         let bytes = std::fs::read(path).ok()?;
         let mut reader = Cursor::new(bytes);
         let mut spr_db: SprDbReader = reader.read_ne().ok()?;
-        let mut out = Vec::with_capacity(spr_db.set_count as usize);
+        let mut out = BTreeMap::new();
 
         spr_db.sets.sort_by(|a, b| a.index.cmp(&b.index));
         for set in spr_db.sets.iter() {
-            out.push(SprDbSet {
-                id: set.id,
-                name: set.name.to_string(),
-                filename: set.filename.to_string(),
-                sprites: vec![],
-                textures: vec![],
-            });
+            out.insert(
+                set.id,
+                SprDbSet {
+                    name: set.name.to_string(),
+                    filename: set.filename.to_string(),
+                    sprites: BTreeMap::new(),
+                    textures: BTreeMap::new(),
+                    index: set.index,
+                },
+            );
         }
 
         for sprite in spr_db.sprites.iter() {
             let spr_set_index = (sprite.set_index & 0xFFF) as usize;
             let entry = SprDbEntry {
-                id: sprite.id,
                 name: sprite.name.to_string(),
                 index: sprite.index,
             };
-            let spr_set = match out.get_mut(spr_set_index) {
+            let spr_set = match out
+                .iter_mut()
+                .find(|(_, v)| v.index == spr_set_index as i32)
+            {
                 Some(spr_set) => spr_set,
                 None => continue,
             };
             if sprite.set_index & 0x1000 == 0x1000 {
-                spr_set.textures.push(entry);
+                spr_set.1.textures.insert(sprite.id, entry);
             } else {
-                spr_set.sprites.push(entry);
+                spr_set.1.sprites.insert(sprite.id, entry);
             }
         }
 
