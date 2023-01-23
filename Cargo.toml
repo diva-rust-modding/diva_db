@@ -17,6 +17,7 @@ serde = { version="1.0.102", optional=true, features=["derive"]}
 cookie-factory = "0.3.0"
 nom_ext = { git="https://github.com/Waelwindows/nom_ext" }
 pyo3 = { version = "0.17.3", optional = true, features = ["extension-module", "abi3-py37", "generate-import-lib"] }
+binrw = "0.10.0"
 
 [dev-dependencies]
 criterion = "0.3.0"
