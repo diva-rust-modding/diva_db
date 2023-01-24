@@ -20,8 +20,7 @@ pub struct AetDb {
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "pyo3", pyclass(get_all, set_all))]
 pub struct AetDbSet {
-    #[cfg_attr(feature = "serde", serde(skip))]
-    index: i32,
+    pub index: i32,
     pub name: String,
     pub filename: String,
     pub spr_set_id: u32,
@@ -32,7 +31,6 @@ pub struct AetDbSet {
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "pyo3", pyclass(get_all, set_all))]
 pub struct AetDbScene {
-    #[cfg_attr(feature = "serde", serde(skip))]
-    index: u16,
+    pub index: u16,
     pub name: String,
 }
