@@ -16,7 +16,7 @@ pub struct AetDb {
     pub sets: BTreeMap<u32, AetDbSet>,
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
+#[derive(Debug, Default, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "pyo3", pyclass(get_all, set_all))]
 pub struct AetDbSet {

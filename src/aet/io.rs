@@ -52,8 +52,8 @@ impl From<AetDbSetReader> for AetDbSet {
             name: set.name.to_string(),
             filename: set.filename.to_string(),
             spr_set_id: set.spr_set_id,
-            scenes: BTreeMap::new(),
             index: set.index,
+            ..Default::default()
         }
     }
 }

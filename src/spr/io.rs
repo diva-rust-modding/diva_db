@@ -63,8 +63,7 @@ impl From<SprDbSetReader> for SprDbSet {
             index: set.index,
             name: set.name.to_string(),
             filename: set.filename.to_string(),
-            sprites: Default::default(),
-            textures: Default::default(),
+            ..Default::default()
         }
     }
 }
