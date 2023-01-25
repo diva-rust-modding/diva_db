@@ -81,6 +81,18 @@ impl Into<(u32, AetDbScene)> for AetDbSceneReader {
 }
 
 impl AetDb {
+    /// Read a [`AetDb`] from a [`Read`] instance
+    ///
+    /// ```rust
+    /// use diva_db::aet::AetDb;
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let reader = std::fs::File::open("assets/aft_aet_db.bin")?;
+    /// let db = AetDb::read(reader)?;
+    /// assert_eq!(db.sets.len(), 1063);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn read<R: Read + Seek>(mut reader: R) -> BinResult<Self> {
         reader.read_ne::<AetDbReader>().map(Into::into)
     }
