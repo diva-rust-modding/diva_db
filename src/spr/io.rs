@@ -90,6 +90,18 @@ impl Into<(u32, SprDbEntry)> for SprDbSpriteReader {
 }
 
 impl SprDb {
+    /// Read a [`SprDb`] from a [`Read`] instance
+    ///
+    /// ```rust
+    /// use diva_db::spr::SprDb;
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let reader = std::fs::File::open("assets/aft_spr_db.bin")?;
+    /// let db = SprDb::read(reader)?;
+    /// assert_eq!(db.sets.len(), 2983);
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn read<R: Read + Seek>(mut reader: R) -> BinResult<Self> {
         reader.read_ne::<SprDbReader>().map(Into::into)
     }
