@@ -1,6 +1,7 @@
 use super::*;
 use crate::py_ffi::*;
 use pyo3::prelude::*;
+use pyo3::types::PyBytes;
 
 #[pymethods]
 impl SprDb {
@@ -31,9 +32,8 @@ impl SprDbEntry {
 }
 
 #[pyfunction]
-fn read(bytes: &[u8]) -> PyResult<SprDb> {
-    let mut cursor = std::io::Cursor::new(bytes);
-    SprDb::read(cursor)
+fn read(bytes: &PyBytes) -> PyResult<SprDb> {
+    SprDb::from_bytes(bytes.as_bytes())
         .map_err(PyBinrwError)
         .map_err(Into::into)
 }

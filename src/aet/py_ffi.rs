@@ -1,4 +1,5 @@
 use pyo3::prelude::*;
+use pyo3::types::PyBytes;
 
 use super::*;
 use crate::py_ffi::*;
@@ -36,9 +37,8 @@ impl AetDbScene {
 }
 
 #[pyfunction]
-fn read(bytes: &[u8]) -> PyResult<AetDb> {
-    let mut cursor = std::io::Cursor::new(bytes);
-    AetDb::read(cursor)
+pub fn read(bytes: &PyBytes) -> PyResult<AetDb> {
+    AetDb::from_bytes(bytes.as_bytes())
         .map_err(PyBinrwError)
         .map_err(Into::into)
 }
