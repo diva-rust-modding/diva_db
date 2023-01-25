@@ -1,3 +1,20 @@
+//! Python bindings for `spr`
+//!
+//! All functions in this module are exposed to python via [`pyo3`].
+//!
+//! See [`diva_db::py_ffi`][crate::py_ffi] for more information.
+//!
+//! # Usage
+//!
+//! ```python
+//! import diva_db
+//!
+//! bytes = open("spr_db.bin", "rb").read()
+//! db = diva_db.spr.read(bytes)
+//! for set in db.sets:
+//!     print(set)
+//! ```
+
 use super::*;
 use crate::py_ffi::*;
 use pyo3::prelude::*;
@@ -55,6 +72,7 @@ impl SprDbEntry {
     }
 }
 
+/// Read a `SprDb` from `bytes`.
 #[pyfunction]
 fn read(bytes: &PyBytes) -> PyResult<SprDb> {
     SprDb::from_bytes(bytes.as_bytes())

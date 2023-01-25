@@ -1,3 +1,20 @@
+//! Python bindings for `aet`
+//!
+//! All functions in this module are exposed to python via [`pyo3`].
+//!
+//! See [`diva_db::py_ffi`][crate::py_ffi] for more information.
+//!
+//! # Usage
+//!
+//! ```python
+//! import diva_db
+//!
+//! bytes = open("aet_db.bin", "rb").read()
+//! db = diva_db.aet.read(bytes)
+//! for set in db.sets:
+//!     print(set)
+//! ```
+
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 
@@ -60,6 +77,7 @@ impl AetDbScene {
     }
 }
 
+/// Read an `AetDb` from `bytes`.
 #[pyfunction]
 pub fn read(bytes: &PyBytes) -> PyResult<AetDb> {
     AetDb::from_bytes(bytes.as_bytes())
