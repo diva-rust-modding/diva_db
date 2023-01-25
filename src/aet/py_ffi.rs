@@ -7,6 +7,10 @@ use crate::spr::{SprDb, SprDbSet};
 
 #[pymethods]
 impl AetDb {
+    #[new]
+    fn py_new(sets: BTreeMap<u32, AetDbSet>) -> Self {
+        Self { sets }
+    }
     fn __repr__(&self) -> PyResult<String> {
         Ok(format!("AetDb: {} set(s)", self.sets.len()))
     }
@@ -14,6 +18,22 @@ impl AetDb {
 
 #[pymethods]
 impl AetDbSet {
+    #[new]
+    fn new(
+        index: i32,
+        name: String,
+        filename: String,
+        scenes: BTreeMap<u32, AetDbScene>,
+        spr_set_id: u32,
+    ) -> Self {
+        Self {
+            index,
+            name,
+            filename,
+            scenes,
+            spr_set_id,
+        }
+    }
     fn get_spr_set(&self, db: SprDb) -> Option<SprDbSet> {
         db.sets.get(&self.spr_set_id).cloned()
     }
@@ -31,6 +51,10 @@ impl AetDbSet {
 
 #[pymethods]
 impl AetDbScene {
+    #[new]
+    fn py_new(index: u16, name: String) -> Self {
+        Self { index, name }
+    }
     fn __repr__(&self) -> PyResult<String> {
         Ok(format!("AetDbScene({}: '{}')", self.index, self.name))
     }

@@ -5,6 +5,10 @@ use pyo3::types::PyBytes;
 
 #[pymethods]
 impl SprDb {
+    #[new]
+    fn py_new(sets: BTreeMap<u32, SprDbSet>) -> Self {
+        Self { sets }
+    }
     fn __repr__(&self) -> PyResult<String> {
         Ok(format!("SprDb: {} set(s)", self.sets.len()))
     }
@@ -12,6 +16,22 @@ impl SprDb {
 
 #[pymethods]
 impl SprDbSet {
+    #[new]
+    fn py_new(
+        index: i32,
+        name: String,
+        filename: String,
+        sprites: BTreeMap<u32, SprDbEntry>,
+        textures: BTreeMap<u32, SprDbEntry>,
+    ) -> Self {
+        Self {
+            index,
+            name,
+            filename,
+            sprites,
+            textures,
+        }
+    }
     fn __repr__(&self) -> PyResult<String> {
         Ok(format!(
             "SprDbSet({}: '{}' @ {:?}): {} texture(s), {} sprite(s)",
@@ -26,6 +46,10 @@ impl SprDbSet {
 
 #[pymethods]
 impl SprDbEntry {
+    #[new]
+    fn py_new(index: u16, name: String) -> Self {
+        Self { index, name }
+    }
     fn __repr__(&self) -> PyResult<String> {
         Ok(format!("SprDbEntry({}: '{}')", self.index, self.name))
     }
