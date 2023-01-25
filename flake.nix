@@ -80,6 +80,10 @@
           diva_db-python = diva_db-python-drv pkgs true pkgs.python3Packages;
           default = diva_db;
         };
+        checks = {
+          rust = packages.diva_db;
+          python = packages.diva_db-python;
+        };
         devShells.default = pkgs.mkShell rec {
           nativeBuildInputs = with pkgs; [
             (pkgs.rust-bin.stable.latest.default.override {
