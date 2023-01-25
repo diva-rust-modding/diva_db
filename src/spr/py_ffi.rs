@@ -14,7 +14,7 @@ impl SprDb {
 impl SprDbSet {
     fn __repr__(&self) -> PyResult<String> {
         Ok(format!(
-            "SprDbSet({}: {} @ {:?}): {} texture(s), {} sprite(s)",
+            "SprDbSet({}: '{}' @ {:?}): {} texture(s), {} sprite(s)",
             self.index,
             self.name,
             self.filename,
@@ -27,7 +27,7 @@ impl SprDbSet {
 #[pymethods]
 impl SprDbEntry {
     fn __repr__(&self) -> PyResult<String> {
-        Ok(format!("SprDbEntry({}: {})", self.index, self.name))
+        Ok(format!("SprDbEntry({}: '{}')", self.index, self.name))
     }
 }
 

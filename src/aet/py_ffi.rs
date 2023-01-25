@@ -20,7 +20,7 @@ impl AetDbSet {
 
     fn __repr__(&self) -> PyResult<String> {
         Ok(format!(
-            "AetDbSet({}: {} @ {:?}): {} scene(s)",
+            "AetDbSet({}: '{}' @ {:?}): {} scene(s)",
             self.index,
             self.name,
             self.filename,
@@ -32,7 +32,7 @@ impl AetDbSet {
 #[pymethods]
 impl AetDbScene {
     fn __repr__(&self) -> PyResult<String> {
-        Ok(format!("AetDbScene({}: {})", self.index, self.name))
+        Ok(format!("AetDbScene({}: '{}')", self.index, self.name))
     }
 }
 
