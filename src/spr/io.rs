@@ -93,6 +93,25 @@ impl SprDb {
     pub fn read<R: Read + Seek>(mut reader: R) -> BinResult<Self> {
         reader.read_ne::<SprDbReader>().map(Into::into)
     }
+
+    /// Read a [`SprDb`] from a byte slice
+    ///
+    /// This function takes in anything that can be cheaply converted into a `&[u8]` and reads it.
+    /// It is an ergonomic wrapper around [`SprDb::read`]
+    ///
+    /// ```rust
+    /// use diva_db::spr::SprDb;
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let bytes = std::fs::read("assets/aft_spr_db.bin")?;
+    /// let db = SprDb::from_bytes(bytes)?;
+    /// assert_eq!(db.sets.len(), 2983);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn from_bytes<R: AsRef<[u8]>>(bytes: R) -> BinResult<Self> {
+        Self::read(std::io::Cursor::new(bytes))
+    }
 }
 
 #[cfg(test)]

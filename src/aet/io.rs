@@ -84,6 +84,25 @@ impl AetDb {
     pub fn read<R: Read + Seek>(mut reader: R) -> BinResult<Self> {
         reader.read_ne::<AetDbReader>().map(Into::into)
     }
+
+    /// Read a [`AetDb`] from a byte slice
+    ///
+    /// This function takes in anything that can be cheaply converted into a `&[u8]` and reads it.
+    /// It is an ergonomic wrapper around [`AetDb::read`]
+    ///
+    /// ```rust
+    /// use diva_db::aet::AetDb;
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let bytes = std::fs::read("assets/aft_aet_db.bin")?;
+    /// let db = AetDb::from_bytes(bytes)?;
+    /// assert_eq!(db.sets.len(), 1063);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn from_bytes<R: AsRef<[u8]>>(bytes: R) -> BinResult<Self> {
+        Self::read(std::io::Cursor::new(bytes))
+    }
 }
 
 #[cfg(test)]
