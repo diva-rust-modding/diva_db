@@ -1,12 +1,12 @@
 use log::*;
 
-#[cfg(feature="pyo3")]
-mod py_ffi;
 pub mod aet;
 pub mod bone;
-pub mod tex;
 pub mod mot;
+#[cfg(feature = "pyo3")]
+pub mod py_ffi;
 pub mod spr;
+pub mod tex;
 
 #[cfg(test)]
 mod tests {

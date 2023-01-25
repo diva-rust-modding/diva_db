@@ -1,3 +1,41 @@
+//! Python bindings for [`diva_db`](crate)
+//!
+//! # Limitations
+//! Due to limitations in [`pyo3`], the following is not possible directly,
+//!
+//! ## Submodules
+//! According to Issues [#759](https://github.com/PyO3/pyo3/issues/759) and [#1517](https://github.com/PyO3/pyo3/issues/1517#issuecomment-808664021),
+//! it is currently not possible to define python packages.
+//!
+//! For users of `diva_db`, this means that it is not possible to directly import a submodule.
+//! That is,
+//!
+//! ```python
+//! >>> import diva_db.aet # this doesn't work
+//! >>> from diva_db.aet import AetDb # this doesn't work as well
+//! >>> from diva_db import aet # this works
+//! ````
+//!
+//! ## Updating `dict`
+//! currently updating dictionaries has to be explicit.
+//! That is,
+//!
+//! ```python
+//! >>> import diva_db
+//!
+//! >>> db = diva_db.aet.AetDb({})
+//! >>> set = diva_db.aet.AetDbSet(0, "test", "test.bin", {}, 0)
+//! >>> db.sets = { 39: set }
+//! >>> db.sets[39]
+//! AetDbSet(0: 'test' @ "test.bin"): 0 scene(s)
+//! >>> # This doesn't work
+//! >>> db.sets[10] = set
+//! >>> db.sets[10]
+//! Traceback (most recent call last):
+//!   File "<stdin>", line 1, in <module>
+//! KeyError: 10
+//! ````
+
 use pyo3::exceptions::PyIOError;
 use pyo3::prelude::*;
 use pyo3::wrap_pymodule;
