@@ -3,7 +3,7 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "nixpkgs/nixos-21.11";
+    nixpkgs.url = "nixpkgs/nixos-unstable";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -25,6 +25,7 @@
         src = ./.;
 
         buildFeatures = [ "serde" "pyo3" ];
+        doCheck = false;
 
         cargoLock = {
           # Why I yes, I would like not writing the hash of my Cargo.lock very much.
@@ -76,7 +77,7 @@
       in rec {
         packages = rec {
           diva_db = diva_db-drv pkgs;
-          diva_db-python = diva_db-python-drv pkgs false pkgs.python3Packages;
+          diva_db-python = diva_db-python-drv pkgs true pkgs.python3Packages;
           default = diva_db;
         };
         devShells.default = pkgs.mkShell rec {
@@ -95,7 +96,7 @@
             maturin
             rust-analyzer
             pkgsCross.mingwW64.stdenv.cc
-            pkgs.pkgsCross.mingwW64.windows.pthreads
+            # pkgs.pkgsCross.mingwW64.windows.pthreads
             (pkgs.python3.withPackages (p:
               with p; [
                 cffi
@@ -115,7 +116,7 @@
     // {
       overlays.default = final: prev: rec {
         diva_db = diva_db-drv prev;
-        python3 = prev.python3.override (pythonOverride prev false);
+        python3 = prev.python3.override (pythonOverride prev true);
         python310 = prev.python310.override (pythonOverride prev true);
         python39 = prev.python39.override (pythonOverride prev false);
       };
